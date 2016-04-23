@@ -9,6 +9,7 @@
 #       HAVE_RPI_API              1 if Raspberry Pi is supported
 #       HAVE_TDA995X_API          1 if TDA995X is supported
 #       HAVE_EXYNOS_API           1 if Exynos is supported
+#       HAVE_AOCEC_API            1 if AOCEC is supported
 #       HAVE_P8_USB               1 if Pulse-Eight devices are supported
 #       HAVE_P8_USB_DETECT        1 if Pulse-Eight devices can be auto-detected
 #       HAVE_DRM_EDID_PARSER      1 if DRM EDID parsing is supported
@@ -131,6 +132,18 @@ else()
     list(APPEND CEC_SOURCES ${CEC_SOURCES_ADAPTER_EXYNOS})
   else()
     set(HAVE_EXYNOS_API 0)
+  endif()
+
+  # AOCEC
+  if (${HAVE_AOCEC_API})
+    set(LIB_INFO "${LIB_INFO}, AOCEC")
+    set(HAVE_AOCEC_API 1)
+    set(CEC_SOURCES_ADAPTER_AOCEC adapter/AOCEC/AOCECAdapterDetection.cpp
+                                   adapter/AOCEC/AOCECAdapterCommunication.cpp)
+    source_group("Source Files\\adapter\\AOCEC" FILES ${CEC_SOURCES_ADAPTER_AOCEC})
+    list(APPEND CEC_SOURCES ${CEC_SOURCES_ADAPTER_AOCEC})
+  else()
+    set(HAVE_AOCEC_API 0)
   endif()
 endif()
 
