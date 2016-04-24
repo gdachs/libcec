@@ -87,9 +87,9 @@ bool CAOCECAdapterCommunication::Open(uint32_t UNUSED(iTimeoutMs), bool UNUSED(b
   {
 	uint32_t enable = true;
 
-	if (ioctl(m_fd, CEC_IOC_SET_OPTION_ENALBE_CEC, &enable))
+	if (ioctl(m_fd, CEC_IOC_SET_OPTION_SYS_CTRL, enable))
 	{
-	  LIB_CEC->AddLog(CEC_LOG_ERROR, "%s: IOCTL CEC_IOC_SET_OPTION_ENALBE_CEC failed !", __func__);
+	  LIB_CEC->AddLog(CEC_LOG_ERROR, "%s: IOCTL IOCTL CEC_IOC_SET_OPTION_SYS_CTRL failed !", __func__);
 	  return false;
 	}
 
@@ -111,9 +111,9 @@ void CAOCECAdapterCommunication::Close(void)
 
   uint32_t enable = false;
 
-  if (ioctl(m_fd, CEC_IOC_SET_OPTION_ENALBE_CEC, &enable))
+  if (ioctl(m_fd, CEC_IOC_SET_OPTION_SYS_CTRL, enable))
   {
-	LIB_CEC->AddLog(CEC_LOG_ERROR, "%s: IOCTL CEC_IOC_SET_OPTION_ENALBE_CEC failed !", __func__);
+    LIB_CEC->AddLog(CEC_LOG_ERROR, "%s: IOCTL CEC_IOC_SET_OPTION_SYS_CTRL failed !", __func__);
   }
 
   close(m_fd);
@@ -244,7 +244,7 @@ bool CAOCECAdapterCommunication::SetLogicalAddresses(const cec_logical_addresses
 
   CLockObject lock(m_mutex);
 
-  if (ioctl(m_fd, CEC_IOC_ADD_LOGICAL_ADDR, &log_addr))
+  if (ioctl(m_fd, CEC_IOC_ADD_LOGICAL_ADDR, log_addr))
   {
     LIB_CEC->AddLog(CEC_LOG_ERROR, "%s: IOCTL CEC_IOC_ADD_LOGICAL_ADDR failed !", __func__);
     return false;
@@ -265,7 +265,7 @@ void CAOCECAdapterCommunication::HandleLogicalAddressLost(cec_logical_address UN
 
   CLockObject lock(m_mutex);
 
-  if (ioctl(m_fd, CEC_IOC_ADD_LOGICAL_ADDR, &log_addr))
+  if (ioctl(m_fd, CEC_IOC_ADD_LOGICAL_ADDR, log_addr))
   {
     LIB_CEC->AddLog(CEC_LOG_ERROR, "%s: IOCTL CEC_IOC_ADD_LOGICAL_ADDR failed !", __func__);
   }
