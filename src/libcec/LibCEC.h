@@ -87,6 +87,7 @@ namespace CEC
       bool SetHDMIPort(cec_logical_address iBaseDevice, uint8_t iPort = CEC_DEFAULT_HDMI_PORT);
       uint8_t VolumeUp(bool bSendRelease = true);
       uint8_t VolumeDown(bool bSendRelease = true);
+      uint8_t Volume(uint8_t iVolume);
       uint8_t MuteAudio(bool bSendRelease = true);
       bool SendKeypress(cec_logical_address iDestination, cec_user_control_code key, bool bWait = true);
       bool SendKeyRelease(cec_logical_address iDestination, bool bWait = true);

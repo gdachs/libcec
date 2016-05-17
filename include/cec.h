@@ -251,6 +251,13 @@ namespace CEC
     virtual uint8_t VolumeDown(bool bSendRelease = true) = 0;
 
     /*!
+     * @brief Sents the volume of an audiosystem if it's present.
+     * @param iVolume The volume between is a value between 0 and 100.
+     * @return The new audio status.
+     */
+    virtual uint8_t Volume(uint8_t iVolume) = 0;
+
+    /*!
      * @deprecated Use AudioToggleMute() instead
      * @brief Sends a mute keypress to an audiosystem if it's present.
      * @param bSendRelease Send a key release after the keypress.

@@ -83,6 +83,7 @@ extern DECLSPEC int libcec_is_active_device_type(libcec_connection_t connection,
 extern DECLSPEC int libcec_set_hdmi_port(libcec_connection_t connection, CEC_NAMESPACE cec_logical_address baseDevice, uint8_t iPort);
 extern DECLSPEC int libcec_volume_up(libcec_connection_t connection, int bSendRelease);
 extern DECLSPEC int libcec_volume_down(libcec_connection_t connection, int bSendRelease);
+extern DECLSPEC int libcec_volume(libcec_connection_t connection, int iVolume);
 extern DECLSPEC int libcec_mute_audio(libcec_connection_t connection, int bSendRelease);
 extern DECLSPEC int libcec_send_keypress(libcec_connection_t connection, CEC_NAMESPACE cec_logical_address iDestination, CEC_NAMESPACE cec_user_control_code key, int bWait);
 extern DECLSPEC int libcec_send_key_release(libcec_connection_t connection, CEC_NAMESPACE cec_logical_address iDestination, int bWait);

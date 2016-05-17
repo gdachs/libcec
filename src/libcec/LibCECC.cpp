@@ -317,6 +317,14 @@ int libcec_volume_down(libcec_connection_t connection, int bSendRelease)
       -1;
 }
 
+int libcec_volume(libcec_connection_t connection, int iVolume)
+{
+  ICECAdapter* adapter = static_cast<ICECAdapter*>(connection);
+  return adapter ?
+      adapter->Volume(iVolume) :
+      -1;
+}
+
 int libcec_mute_audio(libcec_connection_t connection, int bSendRelease)
 {
   ICECAdapter* adapter = static_cast<ICECAdapter*>(connection);

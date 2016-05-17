@@ -285,6 +285,11 @@ uint8_t CLibCEC::VolumeDown(bool bSendRelease /* = true */)
   return m_client ? m_client->SendVolumeDown(bSendRelease) : (uint8_t)CEC_AUDIO_VOLUME_STATUS_UNKNOWN;
 }
 
+uint8_t CLibCEC::Volume(uint8_t iVolume)
+{
+  return m_client ? m_client->SendVolume(iVolume) : (uint8_t)CEC_AUDIO_VOLUME_STATUS_UNKNOWN;
+}
+
 uint8_t CLibCEC::MuteAudio(bool UNUSED(bSendRelease) /* = true */)
 {
   AddLog(CEC_LOG_WARNING, "deprecated function called: %s", __FUNCTION__);

@@ -342,6 +342,7 @@ void ShowHelpConsole(void)
   "[spl] {addr}              makes the specified logical address active." << std::endl <<
   "[volup]                   send a volume up command to the amp if present" << std::endl <<
   "[voldown]                 send a volume down command to the amp if present" << std::endl <<
+  "[volume] {0 - 100}        set volume if amp is present" << std::endl <<
   "[mute]                    send a mute/unmute command to the amp if present" << std::endl <<
   "[self]                    show the list of addresses controlled by libCEC" << std::endl <<
   "[scan]                    scan the CEC bus and display device info" << std::endl <<
@@ -634,6 +635,22 @@ bool ProcessCommandVOLDOWN(ICECAdapter *parser, const std::string &command, std:
   return false;
 }
 
+bool ProcessCommandVOLUME(ICECAdapter *parser, const std::string &command, std::string &arguments)
+{
+  if (command == "volume")
+  {
+    std::string strVolume;                                                                                                                                                                                            
+    if (GetWord(arguments, strVolume))
+    {
+      int iVolume = atoi(strVolume.c_str());
+      PrintToStdOut("volume: %2X", parser->Volume(iVolume));
+      return true;
+    }
+  }
+                                                                                                                                                                                                                   
+  return false;
+}
+                     
 bool ProcessCommandMUTE(ICECAdapter *parser, const std::string &command, std::string & UNUSED(arguments))
 {
   if (command == "mute")
@@ -966,6 +983,7 @@ bool ProcessConsoleCommand(ICECAdapter *parser, std::string &input)
       ProcessCommandPING(parser, command, input) ||
       ProcessCommandVOLUP(parser, command, input) ||
       ProcessCommandVOLDOWN(parser, command, input) ||
+      ProcessCommandVOLUME(parser, command, input) ||
       ProcessCommandMUTE(parser, command, input) ||
       ProcessCommandMON(parser, command, input) ||
       ProcessCommandBL(parser, command, input) ||

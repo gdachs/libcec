@@ -274,6 +274,7 @@ namespace CEC
     virtual bool                  IsActiveDeviceType(const cec_device_type type);
     virtual uint8_t               SendVolumeUp(bool bSendRelease = true);
     virtual uint8_t               SendVolumeDown(bool bSendRelease = true);
+    virtual uint8_t               SendVolume(uint8_t iVolume);
     virtual uint8_t               SendMuteAudio(void);
     virtual uint8_t               AudioToggleMute(void);
     virtual uint8_t               AudioMute(void);

@@ -48,6 +48,7 @@ using namespace P8PLATFORM;
 
 #define LIB_CEC     m_processor->GetLib()
 #define ToString(x) CCECTypeUtils::ToString(x)
+#define abs(x)      (((x)>=0)?(x):(-(x)))
 
 CCECClient::CCECClient(CCECProcessor *processor, const libcec_configuration &configuration) :
     m_processor(processor),
@@ -751,6 +752,37 @@ uint8_t CCECClient::SendVolumeDown(bool bSendRelease /* = true */)
   return device && audio && audio->IsPresent() ?
       audio->VolumeDown(device->GetLogicalAddress(), bSendRelease) :
       (uint8_t)CEC_AUDIO_VOLUME_STATUS_UNKNOWN;
+}
+
+uint8_t CCECClient::SendVolume(uint8_t iVolume)
+{
+  if (iVolume > CEC_AUDIO_VOLUME_MAX)
+    iVolume = CEC_AUDIO_VOLUME_MAX;
+
+  uint8_t audioStatus = AudioStatus();
+
+  if (audioStatus != CEC_AUDIO_VOLUME_STATUS_UNKNOWN)
+  {
+    uint8_t volume = audioStatus & CEC_AUDIO_VOLUME_STATUS_MASK;
+    int8_t  volumeChange;
+
+    do
+    {
+      if (volume > iVolume)
+        audioStatus = SendVolumeDown();
+      else if (volume < iVolume)
+        audioStatus = SendVolumeUp();
+
+      if (audioStatus == CEC_AUDIO_VOLUME_STATUS_UNKNOWN)
+        break;
+
+      volumeChange = (audioStatus & CEC_AUDIO_VOLUME_STATUS_MASK) - volume;
+      volume += volumeChange;
+    }
+    while (abs(iVolume - volume) >= abs(volumeChange));
+  }
+
+  return audioStatus;
 }
 
 uint8_t CCECClient::SendMuteAudio(void)

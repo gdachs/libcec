@@ -434,6 +434,16 @@ namespace CecSharp
     }
 
     /// <summary>
+    /// Sents the volume of an audiosystem if it's present.
+    /// </summary>
+    /// <param name="iVolume">The volume between is a number between CEC_AUDIO_VOLUME_MIN and CEC_AUDIO_VOLUME_MAX.</param>
+    /// <returns>The new audio status.</returns>
+    uint8_t Volume(uint8_t iVolume)
+    {
+      return m_libCec->Volume(iVolume);
+    }
+
+    /// <summary>
     /// Sends a mute keypress to an audiosystem if it's present.
     /// </summary>
     /// <param name="sendRelease">Send a key release after the keypress.</param>
