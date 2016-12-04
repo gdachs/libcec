@@ -31,6 +31,7 @@ SET(HAVE_RPI_API         OFF CACHE BOOL "raspberry pi not supported")
 SET(HAVE_TDA995X_API     OFF CACHE BOOL "tda995x not supported")
 SET(HAVE_EXYNOS_API      OFF CACHE BOOL "exynos not supported")
 SET(HAVE_AOCEC_API       OFF CACHE BOOL "aocec not supported")
+SET(HAVE_AMLOGIC_API     OFF CACHE BOOL "amlogic not supported")
 # Pulse-Eight devices are always supported
 set(HAVE_P8_USB          ON  CACHE BOOL "p8 usb-cec supported" FORCE)
 set(HAVE_P8_USB_DETECT   OFF CACHE BOOL "p8 usb-cec detection not supported")
@@ -141,7 +142,7 @@ else()
   # Amlogic
   if (${HAVE_AMLOGIC_API})
     set(LIB_INFO "${LIB_INFO}, Amlogic")
-    set(HAVE_AMLOGIC_API 1)
+    set(HAVE_AMLOGIC_API ON CACHE BOOL "Amlogic supported" FORCE)
     set(CEC_SOURCES_ADAPTER_AMLOGIC adapter/Amlogic/AmlogicCECAdapterDetection.cpp
                                    adapter/Amlogic/AmlogicCECAdapterCommunication.cpp)
     source_group("Source Files\\adapter\\Amlogic" FILES ${CEC_SOURCES_ADAPTER_AMLOGIC})

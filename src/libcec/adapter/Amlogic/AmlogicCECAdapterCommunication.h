@@ -92,7 +92,6 @@ namespace CEC
 
   private:
     bool IsInitialised(void) const { return 1; };
-    int getFileDescriptor(void);
 
     std::string                 m_strError; /**< current error message */
 

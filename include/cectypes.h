@@ -286,8 +286,6 @@ namespace CEC {
  */
 #define CEC_AMLOGIC_VIRTUAL_COM                "Amlogic"
 
-/*!
-
 /**
  * Maximum size of a data packet
  */

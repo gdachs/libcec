@@ -35,7 +35,6 @@
  */
 
 
-#define CEC_DEFAULT_PADDR   0x1000
 #define CEC_IOC_SETLADDR    _IOW('c', 0, unsigned int)
 #define CEC_IOC_GETPADDR    _IO('c', 1)
 #define CEC_MAX_FRAME_SIZE  16
