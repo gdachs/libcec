@@ -45,6 +45,12 @@ Pass the argument `-DHAVE_AOCEC_API=1` to the cmake command in the compilation i
 cmake -DHAVE_AOCEC_API=1 ..
 ```
 
+### SolidPC
+Pass the argument `-DHAVE_SOLIDPC_API=1` to the cmake command in the compilation instructions:
+```
+cmake -DHAVE_SOLIDPC_API=1 ..
+```
+
 ### TDA995x
 Pass the argument `-DHAVE_TDA995X_API=1` to the cmake command in the compilation instructions:
 ```

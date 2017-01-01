@@ -50,6 +50,12 @@ else()
   message(STATUS "AOCEC support:                        no")
 endif()
 
+if (HAVE_SOLIDPC_API)
+  message(STATUS "SolidPC support:                        yes")
+else()
+  message(STATUS "SolidPC support:                        no")
+endif()
+
 if (HAVE_PYTHON)
   message(STATUS "Python support:                         version ${PYTHONLIBS_VERSION_STRING} (${PYTHON_VERSION})")
 else()

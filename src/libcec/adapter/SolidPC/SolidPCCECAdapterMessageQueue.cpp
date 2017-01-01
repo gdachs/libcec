@@ -32,10 +32,10 @@
  */
 
 #include "env.h"
-#include "USBCECAdapterMessageQueue.h"
+#include "SolidPCCECAdapterMessageQueue.h"
 
-#include "USBCECAdapterCommunication.h"
-#include "USBCECAdapterMessage.h"
+#include "SolidPCCECAdapterCommunication.h"
+#include "SolidPCCECAdapterMessage.h"
 #include <p8-platform/sockets/socket.h>
 #include "LibCEC.h"
 
@@ -44,6 +44,7 @@ using namespace P8PLATFORM;
 
 #define MESSAGE_QUEUE_SIGNAL_WAIT_TIME 1000
 
+namespace SolidPCCEC {
 CCECAdapterMessageQueueEntry::CCECAdapterMessageQueueEntry(CCECAdapterMessageQueue *queue, CCECAdapterMessage *message) :
     m_queue(queue),
     m_message(message),
@@ -285,7 +286,7 @@ bool CCECAdapterMessageQueueEntry::TimedOutOrSucceeded(void) const
   return m_message->bFireAndForget && (m_bSucceeded || m_queueTimeout.TimeLeft() == 0);
 }
 
-CCECAdapterMessageQueue::CCECAdapterMessageQueue(CUSBCECAdapterCommunication *com) :
+CCECAdapterMessageQueue::CCECAdapterMessageQueue(CSolidPCCECAdapterCommunication *com) :
   P8PLATFORM::CThread(),
   m_com(com),
   m_iNextMessage(0)
@@ -323,7 +324,8 @@ void *CCECAdapterMessageQueue::Process(void)
         CLockObject lock(m_mutex);
         m_com->WriteToDevice(message->m_message);
       }
-      if (message->m_message->state == ADAPTER_MESSAGE_STATE_ERROR)
+      if (message->m_message->state == ADAPTER_MESSAGE_STATE_ERROR ||
+          message->m_message->Message() == MSGCODE_START_BOOTLOADER)
       {
         message->Signal();
         Clear();
@@ -473,4 +475,5 @@ bool CCECAdapterMessageQueue::Write(CCECAdapterMessage *msg)
 bool CCECAdapterMessageQueue::ProvidesExtendedResponse(void)
 {
   return m_com && m_com->ProvidesExtendedResponse();
+}
 }

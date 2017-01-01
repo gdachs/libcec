@@ -823,34 +823,35 @@ typedef enum cec_bus_device_status
 
 typedef enum cec_vendor_id
 {
-  CEC_VENDOR_TOSHIBA        = 0x000039,
-  CEC_VENDOR_SAMSUNG        = 0x0000F0,
-  CEC_VENDOR_DENON          = 0x0005CD,
-  CEC_VENDOR_MARANTZ        = 0x000678,
-  CEC_VENDOR_LOEWE          = 0x000982,
-  CEC_VENDOR_ONKYO          = 0x0009B0,
-  CEC_VENDOR_MEDION         = 0x000CB8,
-  CEC_VENDOR_TOSHIBA2       = 0x000CE7,
-  CEC_VENDOR_PULSE_EIGHT    = 0x001582,
-  CEC_VENDOR_HARMAN_KARDON2 = 0x001950,
-  CEC_VENDOR_GOOGLE         = 0x001A11,
-  CEC_VENDOR_AKAI           = 0x0020C7,
-  CEC_VENDOR_AOC            = 0x002467,
-  CEC_VENDOR_PANASONIC      = 0x008045,
-  CEC_VENDOR_PHILIPS        = 0x00903E,
-  CEC_VENDOR_DAEWOO         = 0x009053,
-  CEC_VENDOR_YAMAHA         = 0x00A0DE,
-  CEC_VENDOR_GRUNDIG        = 0x00D0D5,
-  CEC_VENDOR_PIONEER        = 0x00E036,
-  CEC_VENDOR_LG             = 0x00E091,
-  CEC_VENDOR_SHARP          = 0x08001F,
-  CEC_VENDOR_SONY           = 0x080046,
-  CEC_VENDOR_BROADCOM       = 0x18C086,
-  CEC_VENDOR_SHARP2         = 0x534850,
-  CEC_VENDOR_VIZIO          = 0x6B746D,
-  CEC_VENDOR_BENQ           = 0x8065E9,
-  CEC_VENDOR_HARMAN_KARDON  = 0x9C645E,
-  CEC_VENDOR_UNKNOWN        = 0
+  CEC_VENDOR_TOSHIBA            = 0x000039,
+  CEC_VENDOR_SAMSUNG            = 0x0000F0,
+  CEC_VENDOR_DENON              = 0x0005CD,
+  CEC_VENDOR_MARANTZ            = 0x000678,
+  CEC_VENDOR_LOEWE              = 0x000982,
+  CEC_VENDOR_ONKYO              = 0x0009B0,
+  CEC_VENDOR_MEDION             = 0x000CB8,
+  CEC_VENDOR_TOSHIBA2           = 0x000CE7,
+  CEC_VENDOR_PULSE_EIGHT        = 0x001582,
+  CEC_VENDOR_HARMAN_KARDON2     = 0x001950,
+  CEC_VENDOR_GOOGLE             = 0x001A11,
+  CEC_VENDOR_AKAI               = 0x0020C7,
+  CEC_VENDOR_AOC                = 0x002467,
+  CEC_VENDOR_PANASONIC          = 0x008045,
+  CEC_VENDOR_PHILIPS            = 0x00903E,
+  CEC_VENDOR_DAEWOO             = 0x009053,
+  CEC_VENDOR_YAMAHA             = 0x00A0DE,
+  CEC_VENDOR_GRUNDIG            = 0x00D0D5,
+  CEC_VENDOR_PIONEER            = 0x00E036,
+  CEC_VENDOR_LG                 = 0x00E091,
+  CEC_VENDOR_SHARP              = 0x08001F,
+  CEC_VENDOR_SONY               = 0x080046,
+  CEC_VENDOR_BROADCOM           = 0x18C086,
+  CEC_VENDOR_SHARP2             = 0x534850,
+  CEC_VENDOR_VIZIO              = 0x6B746D,
+  CEC_VENDOR_BENQ               = 0x8065E9,
+  CEC_VENDOR_HARMAN_KARDON      = 0x9C645E,
+  CEC_VENDOR_STMICROELECTRONICS = 0x000483,
+  CEC_VENDOR_UNKNOWN            = 0
 } cec_vendor_id;
 
 typedef enum cec_adapter_type
@@ -861,7 +862,8 @@ typedef enum cec_adapter_type
   ADAPTERTYPE_RPI              = 0x100,
   ADAPTERTYPE_TDA995x          = 0x200,
   ADAPTERTYPE_EXYNOS           = 0x300,
-  ADAPTERTYPE_AOCEC            = 0x500
+  ADAPTERTYPE_AOCEC            = 0x500,
+  ADAPTERTYPE_SOLIDPC          = 0x600
 } cec_adapter_type;
 
 /** force exporting through swig */

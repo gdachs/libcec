@@ -10,6 +10,7 @@
 #       HAVE_TDA995X_API          ON if TDA995X is supported
 #       HAVE_EXYNOS_API           ON if Exynos is supported
 #       HAVE_AOCEC_API            ON if AOCEC is supported
+#       HAVE_SOLIDPC_API          ON if SolidPC is supported
 #       HAVE_P8_USB               ON if Pulse-Eight devices are supported
 #       HAVE_P8_USB_DETECT        ON if Pulse-Eight devices can be auto-detected
 #       HAVE_DRM_EDID_PARSER      ON if DRM EDID parsing is supported
@@ -30,6 +31,7 @@ SET(HAVE_RPI_API         OFF CACHE BOOL "raspberry pi not supported")
 SET(HAVE_TDA995X_API     OFF CACHE BOOL "tda995x not supported")
 SET(HAVE_EXYNOS_API      OFF CACHE BOOL "exynos not supported")
 SET(HAVE_AOCEC_API       OFF CACHE BOOL "aocec not supported")
+SET(HAVE_SOLIDPC_API     OFF CACHE BOOL "SolidPC not supported")
 # Pulse-Eight devices are always supported
 set(HAVE_P8_USB          ON  CACHE BOOL "p8 usb-cec supported" FORCE)
 set(HAVE_P8_USB_DETECT   OFF CACHE BOOL "p8 usb-cec detection not supported")
@@ -147,6 +149,20 @@ else()
     list(APPEND CEC_SOURCES ${CEC_SOURCES_ADAPTER_AOCEC})
   else()
     set(HAVE_AOCEC_API 0)
+  endif()
+
+  # SolidPC
+  if (${HAVE_SOLIDPC_API})
+    set(LIB_INFO "${LIB_INFO}, SolidPC")
+    SET(HAVE_SOLIDPC_API ON CACHE BOOL "SolidPC supported" FORCE)
+    set(CEC_SOURCES_ADAPTER_SOLIDPC adapter/SolidPC/SolidPCCECAdapterDetection.cpp
+                                    adapter/SolidPC/SolidPCCECAdapterCommunication.cpp
+                                    adapter/SolidPC/SolidPCCECAdapterMessage.cpp
+                                    adapter/SolidPC/SolidPCCECAdapterMessageQueue.cpp)
+    source_group("Source Files\\adapter\\SolidPC" FILES ${CEC_SOURCES_ADAPTER_SOLIDPC})
+    list(APPEND CEC_SOURCES ${CEC_SOURCES_ADAPTER_SOLIDPC})
+  else()
+    set(HAVE_SOLIDPC_API 0)
   endif()
 endif()
 
