@@ -56,7 +56,7 @@ CAOCECAdapterCommunication::CAOCECAdapterCommunication(IAdapterCommunicationCall
   CLockObject lock(m_mutex);
 
   m_logicalAddresses.Clear();
-  m_fd = INVALID_SOCKET_VALUE;
+  m_fd = INVALID_SOCKET_VALUE;init
 }
 
 CAOCECAdapterCommunication::~CAOCECAdapterCommunication(void)

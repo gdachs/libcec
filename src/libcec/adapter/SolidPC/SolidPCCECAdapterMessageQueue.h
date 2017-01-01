@@ -119,8 +119,6 @@ namespace SolidPCCEC
      */
     void Signal(void);
 
-    bool ProvidesExtendedResponse(void);
-
     /*!
      * @return True when a fire and forget packet timed out or succeeded, false otherwise
      */
@@ -128,7 +126,6 @@ namespace SolidPCCEC
 
     CCECAdapterMessageQueue *    m_queue;
     CCECAdapterMessage *         m_message;      /**< the message that was sent */
-    uint8_t                      m_iPacketsLeft; /**< the amount of acks that we're waiting on */
     bool                         m_bSucceeded;   /**< true when the command received a response, false otherwise */
     bool                         m_bWaiting;     /**< true while a thread is waiting or when it hasn't started waiting yet */
     P8PLATFORM::CCondition<bool> m_condition;    /**< the condition to wait on */
@@ -174,8 +171,6 @@ namespace SolidPCCEC
      * @return True when written, false otherwise.
      */
     bool Write(CCECAdapterMessage *msg);
-
-    bool ProvidesExtendedResponse(void);
 
     virtual void *Process(void);
 

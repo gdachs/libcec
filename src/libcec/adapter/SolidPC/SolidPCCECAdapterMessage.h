@@ -184,6 +184,12 @@ namespace SolidPCCEC
     void PushBackHex(uint8_t byte);
 
     /*!
+     * @brief Adds the data in hex byte to this message.
+     * @param data The data package to add as hex.
+     */
+    void PushBackHex(const cec_datapacket &data);
+
+    /*!
      * @brief Adds a byte to this message.
      * @param byte The byte to add.
      * @return True when a full message was received, false otherwise.
@@ -204,16 +210,6 @@ namespace SolidPCCEC
      * @return True when this message is a transmission, false otherwise.
      */
     bool IsTransmission(void) const;
-
-    /*!
-     * @return True when the EOM bit is set, false otherwise.
-     */
-    bool IsEOM(void) const;
-
-    /*!
-     * @return True when the ACK bit is set, false otherwise.
-     */
-    bool IsACK(void) const;
 
     /*!
      * @brief Checks whether the given messagecode is an error message.

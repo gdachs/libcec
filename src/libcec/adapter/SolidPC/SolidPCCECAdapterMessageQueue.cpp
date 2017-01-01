@@ -48,7 +48,6 @@ namespace SolidPCCEC {
 CCECAdapterMessageQueueEntry::CCECAdapterMessageQueueEntry(CCECAdapterMessageQueue *queue, CCECAdapterMessage *message) :
     m_queue(queue),
     m_message(message),
-    m_iPacketsLeft(message->IsTransmission() ? message->Size() / 4 : 1),
     m_bSucceeded(false),
     m_bWaiting(true),
     m_queueTimeout(message->transmit_timeout) {}
@@ -145,9 +144,6 @@ bool CCECAdapterMessageQueueEntry::IsResponse(const CCECAdapterMessage &msg)
   if (msgCode == MessageCode())
     return true;
 
-  if (!ProvidesExtendedResponse())
-    return IsResponseOld(msg);
-
   // response without a msgcode
   if (msgResponse == MSGCODE_NOTHING)
     return false;
@@ -190,35 +186,29 @@ const char *CCECAdapterMessageQueueEntry::ToString(void) const
     return CCECAdapterMessage::ToString(m_message->Message());
 }
 
-bool CCECAdapterMessageQueueEntry::MessageReceivedCommandAccepted(const CCECAdapterMessage &message)
+bool CCECAdapterMessageQueueEntry::MessageReceivedCommandAccepted(
+    const CCECAdapterMessage &message)
 {
   bool bSendSignal(false);
   bool bHandled(false);
   {
     CLockObject lock(m_mutex);
-    if (m_iPacketsLeft > 0)
-    {
-      /* decrease by 1 */
-      m_iPacketsLeft--;
 
 #ifdef CEC_DEBUGGING
-      /* log this message */
-      std::string strLog;
-      strLog = StringUtils::Format("%s - command accepted", ToString());
-      if (m_iPacketsLeft > 0)
-        strLog += StringUtils::Format(" - waiting for %d more", m_iPacketsLeft);
-      m_queue->m_com->m_callback->GetLib()->AddLog(CEC_LOG_DEBUG, "%s", strLog.c_str());
+    /* log this message */
+    std::string strLog;
+    strLog = StringUtils::Format("%s - command accepted", ToString());
+    m_queue->m_com->m_callback->GetLib()->AddLog(CEC_LOG_DEBUG, "%s", strLog.c_str());
 #endif
 
-      /* no more packets left and not a transmission, so we're done */
-      if (!m_message->IsTransmission() && m_iPacketsLeft == 0)
-      {
-        m_message->state = ADAPTER_MESSAGE_STATE_SENT_ACKED;
-        m_message->response = message.packet;
-        bSendSignal = true;
-      }
-      bHandled = true;
+    /* not a transmission, so we're done */
+    if (!m_message->IsTransmission())
+    {
+      m_message->state = ADAPTER_MESSAGE_STATE_SENT_ACKED;
+      m_message->response = message.packet;
+      bSendSignal = true;
     }
+    bHandled = true;
   }
 
   if (bSendSignal)
@@ -227,26 +217,17 @@ bool CCECAdapterMessageQueueEntry::MessageReceivedCommandAccepted(const CCECAdap
   return bHandled;
 }
 
-bool CCECAdapterMessageQueueEntry::MessageReceivedTransmitSucceeded(const CCECAdapterMessage &message)
+bool CCECAdapterMessageQueueEntry::MessageReceivedTransmitSucceeded(
+    const CCECAdapterMessage &message)
 {
   {
     CLockObject lock(m_mutex);
-    if (m_iPacketsLeft == 0)
-    {
-      /* transmission succeeded, so we're done */
+    /* transmission succeeded, so we're done */
 #ifdef CEC_DEBUGGING
-      m_queue->m_com->m_callback->GetLib()->AddLog(CEC_LOG_DEBUG, "%s - transmit succeeded", m_message->ToString().c_str());
+    m_queue->m_com->m_callback->GetLib()->AddLog(CEC_LOG_DEBUG, "%s - transmit succeeded", m_message->ToString().c_str());
 #endif
-      m_message->state = ADAPTER_MESSAGE_STATE_SENT_ACKED;
-      m_message->response = message.packet;
-    }
-    else
-    {
-      /* error, we expected more acks
-         since the messages are processed in order, this should not happen, so this is an error situation */
-      m_queue->m_com->m_callback->GetLib()->AddLog(CEC_LOG_WARNING, "%s - received 'transmit succeeded' but not enough 'command accepted' messages (%d left)", ToString(), m_iPacketsLeft);
-      m_message->state = ADAPTER_MESSAGE_STATE_ERROR;
-    }
+    m_message->state = ADAPTER_MESSAGE_STATE_SENT_ACKED;
+    m_message->response = message.packet;
   }
 
   Signal();
@@ -274,11 +255,6 @@ bool CCECAdapterMessageQueueEntry::MessageReceivedResponse(const CCECAdapterMess
   Signal();
 
   return true;
-}
-
-bool CCECAdapterMessageQueueEntry::ProvidesExtendedResponse(void)
-{
-  return m_queue && m_queue->ProvidesExtendedResponse();
 }
 
 bool CCECAdapterMessageQueueEntry::TimedOutOrSucceeded(void) const
@@ -324,8 +300,7 @@ void *CCECAdapterMessageQueue::Process(void)
         CLockObject lock(m_mutex);
         m_com->WriteToDevice(message->m_message);
       }
-      if (message->m_message->state == ADAPTER_MESSAGE_STATE_ERROR ||
-          message->m_message->Message() == MSGCODE_START_BOOTLOADER)
+      if (message->m_message->state == ADAPTER_MESSAGE_STATE_ERROR)
       {
         message->Signal();
         Clear();
@@ -372,16 +347,8 @@ void CCECAdapterMessageQueue::MessageReceived(const CCECAdapterMessage &msg)
   if (!bHandled)
   {
     /* the message wasn't handled */
-    bool bIsError(m_com->HandlePoll(msg));
-#ifdef CEC_DEBUGGING
-    m_com->m_callback->GetLib()->AddLog(bIsError ? CEC_LOG_WARNING : CEC_LOG_DEBUG, msg.ToString().c_str());
-#else
-    if (bIsError)
-      m_com->m_callback->GetLib()->AddLog(CEC_LOG_WARNING, msg.ToString().c_str());
-#endif
-
     /* push this message to the current frame */
-    if (!bIsError && msg.PushToCecCommand(m_currentCECFrame))
+    if (msg.PushToCecCommand(m_currentCECFrame))
     {
       /* and push the current frame back over the callback method when a full command was received */
       if (m_com->IsInitialised())
@@ -400,7 +367,8 @@ void CCECAdapterMessageQueue::AddData(uint8_t *data, size_t iLen)
     bool bFullMessage(false);
     {
       CLockObject lock(m_mutex);
-      bFullMessage = m_incomingAdapterMessage->PushReceivedByte(data[iPtr]);
+      if (data[iPtr] != '\r')
+        bFullMessage = m_incomingAdapterMessage->PushReceivedByte(data[iPtr]);
     }
 
     if (bFullMessage)
@@ -437,12 +405,9 @@ bool CCECAdapterMessageQueue::Write(CCECAdapterMessage *msg)
 
   uint64_t iEntryId(0);
   /* add to the wait for ack queue */
-  if (msg->Message() != MSGCODE_START_BOOTLOADER)
-  {
-    CLockObject lock(m_mutex);
-    iEntryId = m_iNextMessage++;
-    m_messages.insert(std::make_pair(iEntryId, entry));
-  }
+  CLockObject lock(m_mutex);
+  iEntryId = m_iNextMessage++;
+  m_messages.insert(std::make_pair(iEntryId, entry));
 
   /* add the message to the write queue */
   m_writeQueue.Push(entry);
@@ -457,11 +422,8 @@ bool CCECAdapterMessageQueue::Write(CCECAdapterMessage *msg)
       bReturn = false;
     }
 
-    if (msg->Message() != MSGCODE_START_BOOTLOADER)
-    {
-      CLockObject lock(m_mutex);
-      m_messages.erase(iEntryId);
-    }
+    CLockObject lock(m_mutex);
+    m_messages.erase(iEntryId);
 
     if (msg->ReplyIsError() && msg->state != ADAPTER_MESSAGE_STATE_SENT_NOT_ACKED)
       msg->state = ADAPTER_MESSAGE_STATE_ERROR;
@@ -470,10 +432,5 @@ bool CCECAdapterMessageQueue::Write(CCECAdapterMessage *msg)
   }
 
   return bReturn;
-}
-
-bool CCECAdapterMessageQueue::ProvidesExtendedResponse(void)
-{
-  return m_com && m_com->ProvidesExtendedResponse();
 }
 }

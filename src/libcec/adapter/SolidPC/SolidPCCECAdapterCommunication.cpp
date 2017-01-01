@@ -262,38 +262,6 @@ void *CSolidPCCECAdapterCommunication::Process(void)
   LIB_CEC->AddLog(CEC_LOG_DEBUG, "communication thread ended");
   return NULL;
 }
-
-bool CSolidPCCECAdapterCommunication::HandlePoll(const CCECAdapterMessage &msg)
-{
-  bool bIsError(msg.IsError());
-  cec_adapter_messagecode messageCode(msg.Message());
-  CLockObject lock(m_mutex);
-
-  if (messageCode == MSGCODE_FRAME_START && msg.IsACK())
-  {
-    m_lastPollDestination = msg.Destination();
-    if (msg.Destination() < CECDEVICE_BROADCAST)
-    {
-      CLockObject waitingLock(m_waitingMutex);
-      if (!m_bWaitingForAck[msg.Destination()] && !msg.IsEOM())
-      {
-        if (m_callback)
-          m_callback->HandlePoll(msg.Initiator(), msg.Destination());
-      }
-      else
-        m_bWaitingForAck[msg.Destination()] = false;
-    }
-  }
-  else if (messageCode == MSGCODE_RECEIVE_FAILED)
-  {
-    /* hack to suppress warnings when an LG is polling */
-    if (m_lastPollDestination != CECDEVICE_UNKNOWN)
-      bIsError = m_callback->HandleReceiveFailed(m_lastPollDestination);
-  }
-
-  return bIsError;
-}
-
 void CSolidPCCECAdapterCommunication::MarkAsWaiting(
     const cec_logical_address dest)
 {

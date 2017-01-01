@@ -95,8 +95,6 @@ namespace SolidPCCEC
     void SetActiveSource(bool bSetTo, bool bClientUnregistered);
     ///}
 
-    bool ProvidesExtendedResponse(void);
-
     void *Process(void);
 
   private:
@@ -139,13 +137,6 @@ namespace SolidPCCEC
      * @return True when the checks passed, false otherwise.
      */
     bool CheckAdapter(uint32_t iTimeoutMs = CEC_DEFAULT_CONNECT_TIMEOUT);
-
-    /*!
-     * @brief Handle a poll message inside the adapter message (checks if one is present).
-     * @param msg The adapter message to parse.
-     * @return True when the message resulted in a CEC error, false otherwise.
-     */
-    bool HandlePoll(const CCECAdapterMessage &msg);
 
     /*!
      * @brief Read data from the device.

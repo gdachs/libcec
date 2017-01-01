@@ -57,50 +57,10 @@ CCECAdapterMessage::CCECAdapterMessage(const cec_command &command,
   PushBack('!');
   PushBack('x');
   PushBackHexLo(command.destination);
+  PushBackHex(command.opcode);
+  PushBackHex(command.parameters);
+  PushBack('~');
 
-//TODO
-#if 0
-  PushEscaped(MSGCODE_TRANSMIT_ACK_POLARITY);
-  if (command.destination == CECDEVICE_BROADCAST)
-    PushEscaped(CEC_TRUE);
-  else
-    PushEscaped(CEC_FALSE);
-  PushBack (MSGEND);
-
-  // add source and destination
-  PushBack(MSGSTART);
-  PushEscaped(
-      command.opcode_set == 0 ?
-          (uint8_t) MSGCODE_TRANSMIT_EOM : (uint8_t) MSGCODE_TRANSMIT);
-  PushBack(((uint8_t) command.initiator << 4) + (uint8_t) command.destination);
-  PushBack(MSGEND);
-
-  // add opcode
-  if (command.opcode_set == 1)
-  {
-    PushBack(MSGSTART);
-    PushEscaped(
-        command.parameters.IsEmpty() ?
-            (uint8_t) MSGCODE_TRANSMIT_EOM : (uint8_t) MSGCODE_TRANSMIT);
-    PushBack((uint8_t) command.opcode);
-    PushBack(MSGEND);
-
-    // add parameters
-    for (int8_t iPtr = 0; iPtr < command.parameters.size; iPtr++)
-    {
-      PushBack(MSGSTART);
-
-      if (iPtr == command.parameters.size - 1)
-        PushEscaped(MSGCODE_TRANSMIT_EOM);
-      else
-        PushEscaped(MSGCODE_TRANSMIT);
-
-      PushEscaped(command.parameters[iPtr]);
-
-      PushBack('~');
-    }
-  }
-#endif
   // set timeout
   transmit_timeout = command.transmit_timeout;
 
@@ -120,27 +80,15 @@ std::string CCECAdapterMessage::ToString(void) const
 
     switch (Message())
     {
-    case MSGCODE_TIMEOUT_ERROR:
-    case MSGCODE_HIGH_ERROR:
-    case MSGCODE_LOW_ERROR:
-    {
-      uint32_t iLine = (Size() >= 4) ? (At(2) << 8) | At(3) : 0;
-      uint32_t iTime =
-          (Size() >= 8) ?
-              (At(4) << 24) | (At(5) << 16) | (At(6) << 8) | At(7) : 0;
-      strMsg += StringUtils::Format(" line:%u", iLine);
-      strMsg += StringUtils::Format(" time:%u", iTime);
-    }
-      break;
     case MSGCODE_FRAME_START:
       if (Size() >= 3)
         strMsg += StringUtils::Format(
-            " initiator:%1x destination:%1x ack:%s %s", Initiator(),
-            Destination(), IsACK() ? "high" : "low", IsEOM() ? "eom" : "");
+            " initiator:%1x destination:%1x", Initiator(),
+            Destination());
       break;
     case MSGCODE_FRAME_DATA:
       if (Size() >= 3)
-        strMsg += StringUtils::Format(" %02x %s", At(2), IsEOM() ? "eom" : "");
+        strMsg += StringUtils::Format(" %02x", At(2));
       break;
     default:
       if (Size() >= 2
@@ -331,6 +279,12 @@ void CCECAdapterMessage::PushBackHex(uint8_t byte)
   packet.PushBack(hex_asc[byte & 0x0f]);
 }
 
+void CCECAdapterMessage::PushBackHex(const cec_datapacket &data)
+{
+  for (uint8_t iPtr = 0; iPtr < data.size; iPtr++)
+    PushBackHex(data[iPtr]);
+}
+
 bool CCECAdapterMessage::PushReceivedByte(uint8_t byte)
 {
   if (byte == '?' && HasStartMessage())
@@ -338,11 +292,9 @@ bool CCECAdapterMessage::PushReceivedByte(uint8_t byte)
     //TODO CLibCEC::AddLog(CEC_LOG_WARNING, "received message start before message end, removing previous buffer contents");
     Clear();
   }
-  if (byte != '\n')
-  {
-    PushBack(byte);
-  }
-  return byte == '\r';
+  PushBack(byte);
+
+  return byte == '\n';
 }
 
 cec_adapter_messagecode CCECAdapterMessage::Message(void) const
@@ -378,16 +330,6 @@ bool CCECAdapterMessage::IsTransmission(void) const
       || msgCode == MSGCODE_TRANSMIT_FAILED_TIMEOUT_LINE
       || msgCode == MSGCODE_TRANSMIT_LINE_TIMEOUT
       || msgCode == MSGCODE_TRANSMIT_SUCCEEDED;
-}
-
-bool CCECAdapterMessage::IsEOM(void) const
-{
-  return packet.size >= 2 ? (packet.At(1) & MSGCODE_FRAME_EOM) != 0 : false;
-}
-
-bool CCECAdapterMessage::IsACK(void) const
-{
-  return packet.size >= 2 ? (packet.At(1) & MSGCODE_FRAME_ACK) != 0 : false;
 }
 
 bool CCECAdapterMessage::MessageCodeIsError(const cec_adapter_messagecode code)
@@ -460,19 +402,16 @@ bool CCECAdapterMessage::PushToCecCommand(cec_command &command) const
     {
       command.initiator = Initiator();
       command.destination = Destination();
-      command.ack = IsACK();
-      command.eom = IsEOM();
     }
-    return IsEOM() && !IsError();
+    return !IsError();
   }
   else if (msgCode == MSGCODE_FRAME_DATA)
   {
     if (Size() >= 3)
     {
       command.PushBack(At(2));
-      command.eom = IsEOM();
     }
-    return IsEOM() && !IsError();
+    return !IsError();
   }
 
   return false;
