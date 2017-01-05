@@ -192,9 +192,16 @@ namespace SolidPCCEC
     /*!
      * @brief Adds a byte to this message.
      * @param byte The byte to add.
-     * @return True when a full message was received, false otherwise.
+     * @return True if a full message was received, false otherwise.
      */
     bool PushReceivedByte(uint8_t byte);
+
+    /*!
+     * @brief Compares the start of the message with a string.
+     * @param str The string to compare with.
+     * @return True if str matches, false otherwise.
+     */
+    bool StartsWith(const char *str);
 
     /*!
      * @return The messagecode inside this adapter message, or MSGCODE_NOTHING if there is none.

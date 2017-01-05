@@ -297,6 +297,11 @@ bool CCECAdapterMessage::PushReceivedByte(uint8_t byte)
   return byte == '\n';
 }
 
+bool CCECAdapterMessage::StartsWith(const char *str)
+{
+   return !memcmp(packet.data, str, strlen(str));
+}
+
 cec_adapter_messagecode CCECAdapterMessage::Message(void) const
 {
   return
@@ -394,9 +399,17 @@ bool CCECAdapterMessage::PushToCecCommand(cec_command &command) const
   if (IsEmpty())
     return false;
 
-  cec_adapter_messagecode msgCode = Message();
-  if (msgCode == MSGCODE_FRAME_START)
+  if (StartsWith("?REC"))
   {
+    for (int i = 4; i < Size(); ++i)
+    {
+      if (!isxdigit(At(i)))
+        continue;
+      if (i + 1 < Size() && isxdigit(At(i + 1)))
+      {
+
+      }
+    }
     command.Clear();
     if (Size() >= 3)
     {
